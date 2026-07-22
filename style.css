@@ -382,3 +382,67 @@ table.admin-table tr:last-child td{border-bottom:none;}
   .container{padding:18px 16px 50px;}
   .year-strip, .tab-nav{padding-left:16px;padding-right:16px;}
 }
+
+
+.site-footer{
+    margin-top:40px;
+    background:var(--ink);
+    border-top:3px solid var(--brass);
+    color:#d7dde5;
+    padding:16px 28px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:15px;
+    font-size:14px;
+}
+
+.footer-left,
+.footer-center,
+.footer-right{
+    display:flex;
+    align-items:center;
+    gap:6px;
+}
+
+.footer-left{
+    color:#bfc8d3;
+}
+
+.footer-center{
+    color:#d7dde5;
+    font-weight:600;
+}
+
+.footer-center strong{
+    color:var(--brass-light);
+    font-weight:600;
+}
+
+.footer-right a{
+    color:var(--brass-light);
+    text-decoration:none;
+    font-weight:600;
+    transition:.2s;
+}
+
+.footer-right a:hover{
+    color:#fff;
+}
+
+@media (max-width:768px){
+
+    .site-footer{
+        flex-direction:column;
+        justify-content:center;
+        text-align:center;
+        padding:18px;
+    }
+
+    .footer-left,
+    .footer-center,
+    .footer-right{
+        justify-content:center;
+    }
+}
