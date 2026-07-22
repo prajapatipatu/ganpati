@@ -167,9 +167,31 @@ document.getElementById("tabNav").addEventListener("click", (e) => {
 });
 
 function filteredRows(sheet) {
-  const rows = state.data[sheet] || [];
-  if (state.currentYear === "all") return rows;
-  return rows.filter(r => String(r.Year) === String(state.currentYear));
+  let rows = [...(state.data[sheet] || [])];
+
+  if (state.currentYear !== "all") {
+    rows = rows.filter(r => String(r.Year) === String(state.currentYear));
+  }
+
+  switch (sheet) {
+    case "Members":
+      rows.sort((a, b) => (parseFloat(b.MemberFee) || 0) - (parseFloat(a.MemberFee) || 0));
+      break;
+
+    case "Income":
+      rows.sort((a, b) => (parseFloat(b.Amount) || 0) - (parseFloat(a.Amount) || 0));
+      break;
+
+    case "Expense":
+      rows.sort((a, b) => (parseFloat(b.Amount) || 0) - (parseFloat(a.Amount) || 0));
+      break;
+
+    case "Sponsors":
+      rows.sort((a, b) => (parseFloat(b.Amount) || 0) - (parseFloat(a.Amount) || 0));
+      break;
+  }
+
+  return rows;
 }
 
 function renderTab() {
