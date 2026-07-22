@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="gu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KUMBHARWAD CHA DADA GANPATI MADAL</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="brand">
+    <div class="brand-seal">KG</div>
+    <div>
+      <div class="brand-name">KUMBHARWAD CHA DADA GANPATI MADAL</div>
+    </div>
+  </div>
+  <div class="header-actions">
+    <button class="btn btn-ghost" id="loginBtn">Admin login</button>
+    <button class="btn btn-ghost hidden" id="logoutBtn">Logout</button>
+  </div>
+</header>
+<div class="year-strip" id="yearStrip">
+  <span class="year-strip-label">Year</span>
+</div>
+<nav class="tab-nav" id="tabNav">
+  <button class="tab-btn active" data-tab="Home">Home</button>
+  <button class="tab-btn" data-tab="Members">Members</button>
+  <button class="tab-btn" data-tab="Income">Income</button>
+  <button class="tab-btn" data-tab="Expense">Expense</button>
+  <button class="tab-btn" data-tab="Gallery">Gallery</button>
+  <button class="tab-btn" data-tab="Sponsors">Sponsors</button>
+</nav>
+<main class="container" id="mainContent">
+  <p class="loading-note">Data is loading...</p>
+</main>
+<!-- Login modal -->
+<div class="modal-overlay hidden" id="loginModal">
+  <div class="modal-box">
+    <h2>Admin login</h2>
+    <div class="field">
+      <label for="loginUser">Username</label>
+      <input type="text" id="loginUser" autocomplete="username">
+    </div>
+    <div class="field">
+      <label for="loginPass">Password</label>
+      <input type="password" id="loginPass" autocomplete="current-password">
+    </div>
+    <p class="error-text" id="loginError"></p>
+    <div class="form-actions">
+      <button class="btn btn-primary" id="loginSubmit">Login</button>
+      <button class="btn" id="loginCancel">Cancel</button>
+    </div>
+  </div>
+</div>
+<div id="toastHost"></div>
+<script src="script.js"></script>
+</body>
+</html>
