@@ -1,11 +1,14 @@
 /* ============================================================
    TRUST REGISTRY - FRONTEND LOGIC
    ============================================================
-   1) Neeche APPS_SCRIPT_URL ma tamara deploy karel
-      Google Apps Script Web App nu URL paste karo.
-   2) LOGIN object ma tamaru admin username/password set karo.
-      (Aa static/client-side login che - sachi security mate
-      server-side authentication vaparvani salaah chhe.)
+   SECURITY UPDATE:
+   - APPS_SCRIPT_URL and admin username/password are NO LONGER
+     stored in this file. They now live only on the server side,
+     inside /api/login.js and /api/data.js (as environment
+     variables on Vercel).
+   - This file calls your own domain's /api/login and /api/data
+     endpoints. The browser/console never sees the real Apps
+     Script URL or the admin password.
 
    NEW IN THIS VERSION:
    - ImageURL field have "Choose file" thi photo upload thai
@@ -13,7 +16,7 @@
    - Add / Update button dabavta pahela dareke field bharel hovi
      joie - nahi to lal border ane error message batavse.
    - Gallery card have Title + photo j batave che (Date nathi
-     batavtu); pehla 3 photo "featured" (moti size) ma upar
+     batavtu); pehla 2 photo "featured" (moti size) ma upar
      batay che, baki badha neeche normal grid ma.
    - Sponsors card have Name + photo j batave che (Contact /
      Amount card par nathi batavta).
@@ -22,11 +25,6 @@
 
 
 const CONFIG = {
-  APPS_SCRIPT_URL: "https://script.google.com/macros/s/AKfycbzgj5lSWBbaeL7PVTT7cYSzDL-9xBS6RIw9uF0j7o6TN5y0KBf55-vh8cxafsA2fXFD/exec",
-  LOGIN: {
-    username: "admin",
-    password: "admin@123"
-  },
   MAX_IMAGE_MB: 10
 };
 
@@ -53,8 +51,12 @@ let pendingImageFiles = {};
 
 /* ---------------- API helpers ---------------- */
 
+/* These now call our OWN domain's /api routes instead of the Apps
+   Script URL directly. The real Apps Script URL lives only in the
+   server-side environment variable APPS_SCRIPT_URL (see /api/data.js). */
+
 async function apiGet(sheet) {
-  const url = `${CONFIG.APPS_SCRIPT_URL}?sheet=${sheet}&year=all`;
+  const url = `/api/data?sheet=${encodeURIComponent(sheet)}&year=all`;
   const res = await fetch(url);
   const json = await res.json();
   if (json.error) throw new Error(json.error);
@@ -62,9 +64,13 @@ async function apiGet(sheet) {
 }
 
 async function apiPost(sheet, action, data) {
-  const res = await fetch(CONFIG.APPS_SCRIPT_URL, {
+  const headers = { "Content-Type": "application/json" };
+  const token = sessionStorage.getItem("trustToken");
+  if (token) headers["x-auth-token"] = token;
+
+  const res = await fetch("/api/data", {
     method: "POST",
-    headers: { "Content-Type": "text/plain" },
+    headers,
     body: JSON.stringify({ sheet, action, data })
   });
   const json = await res.json();
@@ -607,23 +613,42 @@ document.getElementById("loginBtn").addEventListener("click", () => {
   document.getElementById("loginError").textContent = "";
 });
 document.getElementById("loginCancel").addEventListener("click", () => loginModal.classList.add("hidden"));
-document.getElementById("loginSubmit").addEventListener("click", () => {
+
+document.getElementById("loginSubmit").addEventListener("click", async () => {
   const u = document.getElementById("loginUser").value.trim();
   const p = document.getElementById("loginPass").value;
-  if (u === CONFIG.LOGIN.username && p === CONFIG.LOGIN.password) {
+  const submitBtn = document.getElementById("loginSubmit");
+  const errorEl = document.getElementById("loginError");
+  errorEl.textContent = "";
+  submitBtn.disabled = true;
+
+  try {
+    const res = await fetch("/api/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username: u, password: p })
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.error || "Login failed");
+
+    sessionStorage.setItem("trustToken", json.token);
     state.isAdmin = true;
     sessionStorage.setItem("trustAdmin", "yes");
     loginModal.classList.add("hidden");
     updateAuthUI();
     renderTab();
     toast("Login successful.");
-  } else {
-    document.getElementById("loginError").textContent = "Username and password is wrong.";
+  } catch (err) {
+    errorEl.textContent = "Username and password is wrong.";
+  } finally {
+    submitBtn.disabled = false;
   }
 });
+
 document.getElementById("logoutBtn").addEventListener("click", () => {
   state.isAdmin = false;
   sessionStorage.removeItem("trustAdmin");
+  sessionStorage.removeItem("trustToken");
   updateAuthUI();
   renderTab();
   toast("Logout successful.");
